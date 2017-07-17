@@ -3,9 +3,6 @@ require_relative '../client'
 require 'httparty'
 require 'discordrb'
 
-$discordbot = Discordrb::Bot.new token: "your token here", client_id: #your client id here, without quotes
-$channel_id = #your channel id here, without quotes
-
 class Chatbot::DiscordBridge
   include Chatbot::Plugin
 
@@ -13,7 +10,7 @@ class Chatbot::DiscordBridge
     $discordbot.send_message($channel_id, content)
   end
 
-  match /(.*)/, :use_prefix => false, :method => :on_message
+  match /(.*)/, use_prefix: false, method: :on_message
   listen_to :join, :on_join
   listen_to :part, :on_part
   listen_to :kick, :on_kick
@@ -21,11 +18,11 @@ class Chatbot::DiscordBridge
 
   def on_message(user, message)
     if message.start_with? '[b]<'
-      return
+      nil
     elsif message.start_with? '/me '
-      discord_send("**<#{user.name}>** * #{user.name} #{message.sub(/\/me /, '')}")
+      discord_send("**<#{user.name}>** * #{user.name} #{message.sub(%r{/\/me /}, '')}")
     else
-      discord_send("**<#{user.name}>** #{message.gsub(/\[b]|\[\/b]/, '**').gsub(/\[i]|\[\/i]/, '*').gsub(/\[s]|\[\/s]/, '~~').gsub(/\[u]|\[\/u]/, '__').gsub(/\[code]|\[\/code]/, '`').gsub(/\[(?:img|audio|video)="/, 'http://').gsub(/\[(?:yt|youtube)="/, 'https://youtu.be/')}")
+      discord_send("**<#{user.name}>** #{message.gsub(%r{/\[b\]|\[\/b\]/}, '**').gsub(%r{/\[i\]|\[\/i\]/}, '*').gsub(%r{/\[s\]|\[\/s\]/}, '~~').gsub(%r{/\[u\]|\[\/u\]/}, '__').gsub(%r{/\[code\]|\[\/code\]/}, '`').gsub(%r{/\[(?:img|audio|video)="/}, 'http://').gsub(%r{/\[(?:yt|youtube)="/}, 'https://youtu.be/')}")
     end
   end
 
@@ -49,11 +46,18 @@ class Chatbot::DiscordBridge
 
   def initialize(bot)
     super(bot)
+    @c = client.config['discord'] || {}
+    $discordbot = Discordrb::Bot.new token: @c['token'], client_id: @c['id']
+    $channel_id = @c['channel']
     $discordbot.message(in: $channel_id) do |event|
       username = event.author.display_name
       message = event.content
-      bot.send_msg "[b]<#{username}>[/b] #{message.gsub(/\*\*(.*)\*\*/, '[b]\1[/b]').gsub(/\*(.*)\*/, '[i]\1[/i]').gsub(/~~(.*)~~/, '[s]\1[/s]').gsub(/__(.*)__/, '[u]\1[/u]').gsub(/`(.*)`/, '[code]\1[/code]')}"
+      bot.send_msg "[b]<#{username}>[/b] #{message.gsub(/\*\*(.*)\*\*/, '[b\]\1[/b\]').gsub(/\*(.*)\*/, '[i\]\1[/i\]').gsub(/~~(.*)~~/, '[s\]\1[/s\]').gsub(/__(.*)__/, '[u\]\1[/u\]').gsub(/`(.*)`/, '[code\]\1[/code\]')}"
     end
+    $discordbot.message(in: $channel_id) do |event|
+      username = event.author.display_name
+      message = event.content
+    end
+    $discordbot.run
   end
-
 end
