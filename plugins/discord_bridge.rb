@@ -54,10 +54,6 @@ class Chatbot::DiscordBridge
       message = event.content
       bot.send_msg "[b]<#{username}>[/b] #{message.gsub(/\*\*(.*)\*\*/, '[b\]\1[/b\]').gsub(/\*(.*)\*/, '[i\]\1[/i\]').gsub(/~~(.*)~~/, '[s\]\1[/s\]').gsub(/__(.*)__/, '[u\]\1[/u\]').gsub(/`(.*)`/, '[code\]\1[/code\]')}"
     end
-    $discordbot.message(in: $channel_id) do |event|
-      username = event.author.display_name
-      message = event.content
-    end
     $discordbot.run
   end
 end
