@@ -13,9 +13,19 @@ Configuring the plugin
 ----
 First, download and configure the chatbot-rb framework. [Here](http://community.wikia.com/wiki/User:KockaAdmiralac/chatbot-rb) is a guide of how to do that.
 
-Then, download the discord_bridge.rb file from this repository and place it into the `plugins` folder.
+Clone or download this repository. Place the `discord_bridge.rb` from the `plugins` folder into your `plugins` folder.
 
-After configuring the bot, your *main.rb* file should look like this:
+Go to your `chatbot-rb` folder and add this at the bottom of your `config.yml`:
+
+```yaml
+discord:
+  channel: your channel id
+  id: your Discord application id
+  token: Discord bot token
+```
+You can get the channel id by right-clicking your channel and selecting "Copy ID".
+
+Now close the *config.yml* file and open the *main.rb* file. It should look like this:
 
 ```ruby
 require_relative './client'
@@ -35,18 +45,7 @@ Below all your `require_relative` lines, add this one:
 `require_relative './plugins/discord_bridge'`
 And register the plugin with the class name `Chatbot::DiscordBridge`.
 
-Last, above the `$bot.run!` line, add this: `$discordbot.run:async`
-
-Now close the main.rb file and open the discord_bridge.rb file, and find these lines:
-
-```ruby
-$discordbot = Discordrb::Bot.new token: "your token here", client_id: #your client id here, without quotes
-$channel_id = #your channel id here, without quotes
-```
-
-In the first line replace with your bot token and client id, and in the second line with the channel id. You can find the channel id by right-clicking the channel that you want to use, and selecting "copy ID".
-
-Now you can close the discord_bridge.rb file, and run `ruby main.rb` on your command line. When you type something in the Wikia chat, the bot should send it to the Discord channel you specified, and vice versa.
+Now run `ruby main.rb` on your command line. When you type something in the Wikia chat, the bot should send it to the Discord channel you specified, and vice versa.
 
 Issues
 ----
